@@ -56,7 +56,84 @@ graph LR
 ```
 ***为何需要使用add进入暂存区，再commit至本地仓库？***   
 如果你一次性修改了多个模块的文件，`git add <file>`允许你将特定文件的改动放入暂存区，
-`git commit -m "your describtion"`只提交暂存区里的内容，这样就保证了每个提交只做一件逻辑清晰的事情（比如只修复一个 bug 或只添加一个功能），每次提交的改动都是有迹可寻的（构建原子提交 (Atomic Commits)）  
+`git commit -m "your describtion"`只提交暂存区里的内容，这样就保证了每个提交只做一件逻辑清晰的事情（比如只修复一个 bug 或只添加一个功能），每次提交的改动都是有迹可寻的（构建原子提交 (Atomic Commits)）     
+你可以在本地多次 `commit`，最后一次性 `push` 所有提交，本地 `commit` 允许你反复修改、撤销（用 `git reset`），确认无误后再分享到远程    
+团队成员独立开发 → 本地频繁 `commit` → 功能完成后再 `push` 合并，互不干扰
+
 另外可以使用 `git status` 显示哪些文件在工作区修改了（红色），哪些修改在暂存区准备好了（绿色）
 
 ### 4. 和他人协作  
+
+#### 1. Clone
+首先在 GitHub 上点击原仓库的 Fork 按钮，创建属于你账号的副本仓库，从而获得独立开发空间，避免直接污染原仓库  
+- `git clone https://github.com/你的用户名/仓库名.git`，克隆你fork的仓库到本地
+- `git remote add upstream https://github.com/原作者/原仓库.git`，通过 `upstream` 指向原仓库，后续可拉取最新代码
+
+fork的仓库是独立于原仓库的，任何改动都不会影响原仓库。后续对fork仓库的管理按照上一节教程即可。  
+如果你想让原仓库应用你的更改，可以进入你的 GitHub 仓库页面，点击 `Compare & pull request`，维护者会决定是否采纳你的更改
+
+#### 2. Fetch+Merge=Pull & Push
+
+- `git fetch origin`：只获取更新，不修改本地  
+- `git merge origin/main`：合并分支改动，将指定分支的提交合并到当前分支，可能产生冲突需手动解决
+- `git pull`：一键拉取并合并更新，若远程更新与本地修改冲突，会自动触发合并冲突（需手动解决）
+  
+  `git pull origin main` = `git fetch origin` + `git merge origin main`
+
+```mermaid
+graph LR
+    A[远程仓库] -->|git fetch| B(本地：origin/main 更新)
+    B -->|git merge| C[本地分支更新]
+    D[本地提交] -->|git push| A
+    A -->|git pull| C
+```
+`git push`：将本地分支的提交上传到远程仓库的对应分支,**本地分支必须基于远程分支的最新提交（否则需先 pull 解决冲突）**   
+
+***为什么 Push 前一定要 Pull？***   
+这条规则是为了解决 “你的本地历史落后于远程仓库” 导致的问题，比如你最初是在A版本下进行的更改，得到了版本B，但此时远程仓库中已经是版本C了，
+你就需要先处理B和C之间的冲突，即远程修改和你的本地修改冲突时（修改了同一文件的同一行）     
+这样保证你的推送是基于远程最新版本，整合了所有更新，避免覆盖他人工作或推送失败。此时你的本地 main 分支包含了 A -> B -> C -> M（或 A -> C -> B -> M），与远程历史一致，推送成功。
+以下有几种情况：
+1. 未进行更改，pull会直接合并，你的本地分支更新到最新状态
+2. 在work space中修改了，但没有add进暂存区，或add进了暂存区但未commit进本地仓库（即更改仍停留在工作区和暂存区，未进入本地仓库），此时进行pull，git会拒绝合并
+3. 已commit进本地仓库，但未push，Git 会尝试自动合并（Auto-merge）。如果远程修改和你的本地修改不冲突（修改了不同文件/同一文件不同区域），则合并成功，你的提交和别人的远程提交会共存
+
+因此：
+- 工作/推送前，先pull更新本地库
+- 解决可能的冲突
+- push
+
+
+```mermaid
+graph LR
+    A[开始工作前] --> B[git fetch]
+    B --> C{远程有更新?}
+    C -- 有 --> D[git pull]
+    C -- 无 --> E[本地修改/提交]
+    D --> E
+    E --> F[完成功能]
+    F --> G[git add + git commit]
+    G --> H[git fetch] 
+    H --> I{远程有更新?}
+    I -- 有 --> J[git pull]
+    I -- 无 --> K[git push]
+    J --> K
+    J --> L{有冲突?}
+    L -- 有 --> M[手动解决冲突]
+    M --> N[git add + git commit]
+    N --> K
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
