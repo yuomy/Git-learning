@@ -1,12 +1,15 @@
 ##  一、基础部分
 
 ### 1. 一些概念
-- **Repository（仓库）**：顾名思义，存储代码的地方
-- **Remote（远程仓库）**：存储在云端的库，例如你和他人在github、gitee上的库
+- **Remote（远程版本库）**：存储在云端的库，例如你和他人在github、gitee上的库
 - **Origin**：直接关联的仓库
 - **Upstream**：上游库，即你fork的别人的库
-- **Work space（工作区）**：正在编辑的文件
+- **Work space（工作区）**：正在编辑的文件所在的文件夹
+- **Repository（版本库）**：工作区有一个隐藏目录`.git`，是Git的版本库/也可指github等的远程版本库
 - **Staging Area（暂存区）**：提交至本地仓库前的暂存区
+
+
+
 ### 2. branch
 
 git是用于版本控制的工具，他将每次提交的代码版本像树杈一样保存，于是就有了branch（分支），主干部分也是一个branch，称为main/master，每个branch都是一个独立开发线。
@@ -60,7 +63,8 @@ graph LR
 你可以在本地多次 `commit`，最后一次性 `push` 所有提交，本地 `commit` 允许你反复修改、撤销（用 `git reset`），确认无误后再分享到远程    
 团队成员独立开发 → 本地频繁 `commit` → 功能完成后再 `push` 合并，互不干扰
 
-另外可以使用 `git status` 显示哪些文件在工作区修改了（红色），哪些修改在暂存区准备好了（绿色）
+另外可以使用 `git status` 显示哪些文件在工作区修改了（红色），哪些修改在暂存区准备好了（绿色）   
+  <img width="568" height="300" alt="图片" src="https://github.com/user-attachments/assets/e922f539-1b96-47e0-9213-2621a8d33fda" />
 
 ### 4. 和他人协作  
 
