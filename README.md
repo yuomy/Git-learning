@@ -14,4 +14,4 @@ git version 2.34.1
 https://git-scm.com/book/zh/v2
 https://liaoxuefeng.com/books/git/   
 
-感谢gemini、deepseek大爹，可爱的殷海猫哥哥、甜酸鱼姐姐
+感谢gemini、deepseek大爹，还有可爱的殷海猫哥哥、甜酸鱼姐姐

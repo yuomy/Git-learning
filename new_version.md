@@ -34,7 +34,10 @@ graph LR
 
 ***`.gitignore`文件***   
 
-在工作区中还需要一个`.gitignore`文件，用于存放一些不希望使用git管理的文件的文件名，可以减少仓库体积、保障安全……   
+在工作区中还需要一个`.gitignore`文件，用于存放一些不希望使用git管理的文件的文件名，可以减少仓库体积、保障安全……      
+
+`.gitignore`文件本身要放到版本库里，并且可以对`.gitignore`做版本管理   
+
 
 文件内容例如：   
 
@@ -63,11 +66,11 @@ assembly.txt
 ```
 
 以下这些文件一般不必使用git跟踪：   
-1. 操作系统垃圾文件
-2. IDE/编辑器配置
-3. 依赖与编译产物
-4. 日志与临时文件
-5. 敏感信息（环境变量、密钥文件）
+1. **操作系统垃圾文件**
+2. **IDE/编辑器配置**
+3. **依赖与编译产物**
+4. **日志与临时文件**
+5. **敏感信息（环境变量、密钥文件**）
 
 这些内容只需大致了解，不必掌握，要用时问ai   
 
@@ -182,7 +185,23 @@ graph LR
     M --> N[git add + git commit]
     N --> K
 ```
-## 三、 分支管理   
+
+## 三、后悔药   
+
+### 1. 版本回退
+
+- `git log`：查看git日志，获取commit id
+- `git reflog`：查看命令历史，方便后悔回退
+- `git reset --hard <commit_id>`：回退版本
+
+### 2. 撤销修改
+
+#### 1. 丢弃工作区的更改
+- `git checkout -- <file name>`：回退到暂存区，若暂存区没有则回退至最新版本库
+#### 2. 丢弃暂存区的更改
+- `git reset HEAD <file name>`：撤销暂存区的修改（unstage），重新放回工作区
+
+## 四、 分支管理   
 
 ### branch
 
@@ -200,6 +219,7 @@ git是用于版本控制的工具，他将每次提交的代码版本像树杈�
 - `git branch <new-branch-name>`：创建新分支
 - `git checkout <branch-name>`或`git switch <branch-name>`：切换到分支
 - `git checkout -b <new-branch-name>`：创建并切换到新分支
+- `git branch -d <name>`：删除分支
 
 
 
@@ -212,7 +232,21 @@ B(version2.0) --> |新增功能2|F(version2.2)
 C(version3.0) --> E(version4.0)
 ```   
 
-## 四、 Submodule   
+## 五、 标签管理
+
+标签实质是"指向某个commit的指针"，用于代替复杂的commit id（像1a28d3……）。标签就是一个让人容易记住的有意义的名字，它跟某个commit绑在一起。
+
+- `git tag <tag name>`：创建标签
+- `git tag <tag name> <commit id>`：给之前的commit打tag
+- `git tag -a <tag name> -m "description" <commit id>`：创建带有说明的标签
+- `git tag`：查看标签
+- `git show <tag name>`：查看标签信息
+- `git push origin <tag name>`：推送至远程
+- `git push origin --tags`：一次性推送全部尚未推送到远程的本地标签
+- `git tag -d <tag name>`：删除本地标签
+- `git push origin :refs/tags/<tag name>`：删除远程标签
+
+## 六、 Submodule   
 
 - 允许将一个 Git 仓库作为另一个仓库的子目录
 - 保持父子仓库的独立版本控制    
