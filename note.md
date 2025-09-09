@@ -261,4 +261,12 @@ git clone --recurse-submodules https://github.com/user/main-repo.git
 # 更新所有子模块
 git submodule update --remote --recursive
 ```    
-
+      
+在比赛实践中，我们的代码分为驱动和应用层，由于驱动也需要更新迭代，而应用层是驱动在具体场景下的应用，每次进行驱动的更新时，我们不希望影响应用层的代码，于是把二者分开    
+在2025赛季中，`zephyr_workspace/motor`就是驱动部分，`zephyr_workspace/motor/app`就是应用层，我们利用在驱动部分写好的函数接口完成驱动电机、通信等任务    
+不同模块间可以连接不同的git仓库分开管理，在拉取更新和上传代码时需要注意**当前目录**对应的是哪一个模块，也可以用`git remote -v`查看对应的git远程仓库，示例如下：    
+```
+librgod@dxx-pc:~/Learning-collection/Git-learning$ git remote -v
+origin  https://github.com/dxxphy/Git-learning.git (fetch)
+origin  https://github.com/dxxphy/Git-learning.git (push)
+```    
