@@ -23,12 +23,6 @@ Git最初的用途是用于管理本地代码，记录代码的版本更迭，�
 
 ***add、commit辨析***
 
-```mermaid
-graph LR
-    A[你的工作区] -- git add --> B[你的暂存区]
-    B -- git commit --> C[你的本地仓库]
-```
-
   <img width="568" height="300" alt="图片" src="https://github.com/user-attachments/assets/e922f539-1b96-47e0-9213-2621a8d33fda" />   
 
 
@@ -72,7 +66,7 @@ assembly.txt
 4. **日志与临时文件**
 5. **敏感信息（环境变量、密钥文件**）
 
-这些内容只需大致了解，不必掌握，要用时问ai   
+这些内容只需大致了解，不必掌握，要用时问AI即可   
 
 ```mermaid
 graph LR
@@ -95,7 +89,7 @@ git add .gitignore                # 先提交忽略规则
  
 如果已经commit了所有文件，需要   
 ```
-# 1. 初始化后立即创建.gitignore
+# 1. 初始化后立即创建.gitignore，例如：
 echo ".env" >> .gitignore
 echo "*.key" >> .gitignore
 
@@ -116,10 +110,10 @@ Git不仅可以用于本地版本库管理，还可以配合github和gitee等远
 #### 创建库
 
 如果你想开始一个自己的项目，可以在github中创建一个repository，然后进入本地完成好的项目文件目录下
-1. 使用 `git remote add origin <url>` （url为github库的网址，例如：``https://github.com/NEW_USERNAME/my-new-repo.git``，`origin`是默认的远程仓库名称）将你创建的github库和本地仓库联系起来，此操作只需做一次
+1. 使用 `git remote add origin <url>` （url为github库的网址，例如：``https://github.com/USERNAME/my-new-repo.git``，`origin`是默认的远程仓库名称）将你创建的github库和本地仓库联系起来，此操作只需做一次
 2. 使用 `git add <file_name> / git add .` 将工作区的修改添加到暂存区（准备提交）
 3. 使用 `git commit -m "your describtion"` 提交到本地的 Git 仓库（位于项目隐藏的 `.git`目录中）
-4. 使用 `git push origin <branch_name>` 将本地仓库的新提交上传到远程仓库（如 GitHub 的 `main` 分支）
+4. 使用 `git push origin <branch_name>` 将本地仓库的新提交上传到远程仓库的某个分支（如 GitHub 的 `main` 分支）
    - `-u` 告诉 Git，将本地的 `main` 分支与远程 `origin` 上的 `main` 分支关联起来。设置好后，后续在这个分支上直接运行 `git push` 或 `git pull`，Git 就知道应该推送到/拉取自哪个远程仓库的哪个分支，无需再指定 `origin main`   
 
 你可以在本地多次 `commit`，最后一次性 `push` 所有提交   
@@ -184,22 +178,43 @@ graph LR
     L -- 有 --> M[手动解决冲突]
     M --> N[git add + git commit]
     N --> K
-```
+```    
+
+#### 3. rebase  (变基)  
+第二种合并分支的方法是 `git rebase`。Rebase 实际上就是取出一系列的提交记录，“复制”它们，然后在另外一个地方逐个的放下去。Rebase 的优势就是可以创造更线性的提交历史，看上去会很清晰。    
+示例如下：  
+
+```mermaid
+graph LR
+    C0 --> C1
+    C0 --> *C2
+```      
+
+在C2分支上 `git rebase C1`，表示将C2的“base”换成C1，则提交记录变为：    
+
+```mermaid
+graph LR
+    C0 --> C1
+    C1 --> *C2'
+```   
 
 ## 三、后悔药   
 
 ### 1. 版本回退
 
-- `git log`：查看git日志，获取commit id
-- `git reflog`：查看命令历史，方便后悔回退
-- `git reset --hard <commit_id>`：回退版本
+- `git log`：查看git日志，获取`[commit id]`
+- `git reflog`：查看命令历史
+- `git reset --xxx <commit_id>`：适用于本地的版本回退
+- `git revert [commit_id]`：适用于远程分支的版本回退
 
-### 2. 撤销修改
+#### 1. `git reset`
+- `git reset --soft [commit_id]`：只移动 HEAD 指针和分支指针。你的工作目录和暂存区中的文件保持不变。这通常用于你只是想撤销一个提交，但想保留所有修改，以便重新提交
+- `git reset --mixed [commit_id]`（默认）：移动 HEAD 指针和分支指针，并且重置暂存区。你的工作目录中的文件保持不变。这个操作相当于 `git reset --soft` 之后再执行 `git restore --staged .`
+- `git reset --hard [commit_id]`：这是最彻底的回退方式。它会移动 HEAD 指针和分支指针，并且重置暂存区和工作目录。这意味着所有在 `[commit_id]` 之后提交的修改都会被彻底删除，无法恢复。使用时务必谨慎
 
-#### 1. 丢弃工作区的更改
-- `git checkout -- <file name>`：回退到暂存区，若暂存区没有则回退至最新版本库
-#### 2. 丢弃暂存区的更改
-- `git reset HEAD <file name>`：撤销暂存区的修改（unstage），重新放回工作区
+#### 2. `git revert`
+一种“安全”的回退方式。它不会删除历史提交，而是创建一个新的提交来撤销指定提交中的更改，因此不会影响其他协作者的提交历史，可以安全地推送到远程仓库
+
 
 ## 四、 分支管理   
 
@@ -232,6 +247,22 @@ B(version2.0) --> |新增功能2|F(version2.2)
 C(version3.0) --> E(version4.0)
 ```   
 
+#### 注：有关HEAD与分支名称
+**分支名称** 的实质是一个永远指向该分支最新一次提交的可移动指针，
+- 当你创建一个新的提交时，这个分支指针会自动前进，指向新的提交
+- 当你执行 git reset 这样的操作时，分支指针会向后移动，指向你指定的回退提交    
+
+**HEAD** 是一个特殊的指针，它始终指向你当前所在的位置
+- 当你位于某个分支时：HEAD 指向这个分支名称。例如，当你 `git checkout main` 后，HEAD 指向 main 分支。
+- 当你不位于任何分支时：HEAD 直接指向某个特定的提交ID，这被称为“分离 HEAD”（detached HEAD）状态
+
+当你处在一个分支上时，HEAD 指向这个分支名称，而这个分支名称又指向一个具体的提交。这是一个指针的指针关系。这个关系解释了为什么当你创建新提交时，分支和 HEAD 会一起移动    
+
+```mermaid
+graph LR
+    HEAD --> 分支名称,如bugfixed
+    分支名称,如bugfixed --> 4f1005978
+```  
 ## 五、 标签管理
 
 标签实质是"指向某个commit的指针"，用于代替复杂的commit id（像1a28d3……）。标签就是一个让人容易记住的有意义的名字，它跟某个commit绑在一起。
